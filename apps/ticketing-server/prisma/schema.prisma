@@ -1,0 +1,82 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Ticket {
+  assignedTo  String?
+  assignments Assignment[]
+  comments    Comment[]
+  createdAt   DateTime            @default(now())
+  createdBy   String?
+  description String?
+  id          String              @id @default(cuid())
+  priority    EnumTicketPriority?
+  project     Project?            @relation(fields: [projectId], references: [id])
+  projectId   String?
+  status      EnumTicketStatus?
+  title       String?
+  updatedAt   DateTime            @updatedAt
+}
+
+model Project {
+  createdAt   DateTime @default(now())
+  description String?
+  id          String   @id @default(cuid())
+  name        String?
+  tickets     Ticket[]
+  updatedAt   DateTime @updatedAt
+}
+
+model Assignment {
+  assignee  String?
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  ticket    Ticket?  @relation(fields: [ticketId], references: [id])
+  ticketId  String?
+  updatedAt DateTime @updatedAt
+}
+
+model Comment {
+  content   String?
+  createdAt DateTime @default(now())
+  createdBy String?
+  id        String   @id @default(cuid())
+  ticket    Ticket?  @relation(fields: [ticketId], references: [id])
+  ticketId  String?
+  updatedAt DateTime @updatedAt
+}
+
+model Login {
+  createdAt DateTime  @default(now())
+  id        String    @id @default(cuid())
+  timestamp DateTime?
+  updatedAt DateTime  @updatedAt
+  user      User?     @relation(fields: [userId], references: [id])
+  userId    String?
+}
+
+model User {
+  createdAt DateTime @default(now())
+  email     String?  @unique
+  firstName String?
+  id        String   @id @default(cuid())
+  lastName  String?
+  logins    Login[]
+  password  String
+  roles     Json
+  updatedAt DateTime @updatedAt
+  username  String   @unique
+}
+
+enum EnumTicketPriority {
+  Option1
+}
+
+enum EnumTicketStatus {
+  Option1
+}
