@@ -1,7 +1,7 @@
 import { Assignment as TAssignment } from "../api/assignment/Assignment";
 
-export const ASSIGNMENT_TITLE_FIELD = "id";
+export const ASSIGNMENT_TITLE_FIELD = "assignee";
 
 export const AssignmentTitle = (record: TAssignment): string => {
-  return record.id?.toString() || String(record.id);
+  return record.assignee?.toString() || String(record.id);
 };

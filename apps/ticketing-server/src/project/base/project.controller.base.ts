@@ -22,6 +22,9 @@ import { Project } from "./Project";
 import { ProjectFindManyArgs } from "./ProjectFindManyArgs";
 import { ProjectWhereUniqueInput } from "./ProjectWhereUniqueInput";
 import { ProjectUpdateInput } from "./ProjectUpdateInput";
+import { TicketFindManyArgs } from "../../ticket/base/TicketFindManyArgs";
+import { Ticket } from "../../ticket/base/Ticket";
+import { TicketWhereUniqueInput } from "../../ticket/base/TicketWhereUniqueInput";
 
 export class ProjectControllerBase {
   constructor(protected readonly service: ProjectService) {}
@@ -34,7 +37,9 @@ export class ProjectControllerBase {
       data: data,
       select: {
         createdAt: true,
+        description: true,
         id: true,
+        name: true,
         updatedAt: true,
       },
     });
@@ -49,7 +54,9 @@ export class ProjectControllerBase {
       ...args,
       select: {
         createdAt: true,
+        description: true,
         id: true,
+        name: true,
         updatedAt: true,
       },
     });
@@ -65,7 +72,9 @@ export class ProjectControllerBase {
       where: params,
       select: {
         createdAt: true,
+        description: true,
         id: true,
+        name: true,
         updatedAt: true,
       },
     });
@@ -90,7 +99,9 @@ export class ProjectControllerBase {
         data: data,
         select: {
           createdAt: true,
+          description: true,
           id: true,
+          name: true,
           updatedAt: true,
         },
       });
@@ -115,7 +126,9 @@ export class ProjectControllerBase {
         where: params,
         select: {
           createdAt: true,
+          description: true,
           id: true,
+          name: true,
           updatedAt: true,
         },
       });
@@ -127,5 +140,92 @@ export class ProjectControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.Get("/:id/tickets")
+  @ApiNestedQuery(TicketFindManyArgs)
+  async findTickets(
+    @common.Req() request: Request,
+    @common.Param() params: ProjectWhereUniqueInput
+  ): Promise<Ticket[]> {
+    const query = plainToClass(TicketFindManyArgs, request.query);
+    const results = await this.service.findTickets(params.id, {
+      ...query,
+      select: {
+        assignedTo: true,
+        createdAt: true,
+        createdBy: true,
+        description: true,
+        id: true,
+        priority: true,
+
+        project: {
+          select: {
+            id: true,
+          },
+        },
+
+        status: true,
+        title: true,
+        updatedAt: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/tickets")
+  async connectTickets(
+    @common.Param() params: ProjectWhereUniqueInput,
+    @common.Body() body: TicketWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      tickets: {
+        connect: body,
+      },
+    };
+    await this.service.updateProject({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/tickets")
+  async updateTickets(
+    @common.Param() params: ProjectWhereUniqueInput,
+    @common.Body() body: TicketWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      tickets: {
+        set: body,
+      },
+    };
+    await this.service.updateProject({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/tickets")
+  async disconnectTickets(
+    @common.Param() params: ProjectWhereUniqueInput,
+    @common.Body() body: TicketWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      tickets: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateProject({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 }

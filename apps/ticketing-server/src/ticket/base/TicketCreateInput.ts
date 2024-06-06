@@ -9,5 +9,119 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-class TicketCreateInput {}
+import { InputType, Field } from "@nestjs/graphql";
+import { ApiProperty } from "@nestjs/swagger";
+import { IsString, IsOptional, ValidateNested, IsEnum } from "class-validator";
+import { AssignmentCreateNestedManyWithoutTicketsInput } from "./AssignmentCreateNestedManyWithoutTicketsInput";
+import { Type } from "class-transformer";
+import { CommentCreateNestedManyWithoutTicketsInput } from "./CommentCreateNestedManyWithoutTicketsInput";
+import { EnumTicketPriority } from "./EnumTicketPriority";
+import { ProjectWhereUniqueInput } from "../../project/base/ProjectWhereUniqueInput";
+import { EnumTicketStatus } from "./EnumTicketStatus";
+
+@InputType()
+class TicketCreateInput {
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  assignedTo?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssignmentCreateNestedManyWithoutTicketsInput,
+  })
+  @ValidateNested()
+  @Type(() => AssignmentCreateNestedManyWithoutTicketsInput)
+  @IsOptional()
+  @Field(() => AssignmentCreateNestedManyWithoutTicketsInput, {
+    nullable: true,
+  })
+  assignments?: AssignmentCreateNestedManyWithoutTicketsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => CommentCreateNestedManyWithoutTicketsInput,
+  })
+  @ValidateNested()
+  @Type(() => CommentCreateNestedManyWithoutTicketsInput)
+  @IsOptional()
+  @Field(() => CommentCreateNestedManyWithoutTicketsInput, {
+    nullable: true,
+  })
+  comments?: CommentCreateNestedManyWithoutTicketsInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  createdBy?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  description?: string | null;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumTicketPriority,
+  })
+  @IsEnum(EnumTicketPriority)
+  @IsOptional()
+  @Field(() => EnumTicketPriority, {
+    nullable: true,
+  })
+  priority?: "Option1" | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProjectWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ProjectWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ProjectWhereUniqueInput, {
+    nullable: true,
+  })
+  project?: ProjectWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumTicketStatus,
+  })
+  @IsEnum(EnumTicketStatus)
+  @IsOptional()
+  @Field(() => EnumTicketStatus, {
+    nullable: true,
+  })
+  status?: "Option1" | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  title?: string | null;
+}
+
 export { TicketCreateInput as TicketCreateInput };

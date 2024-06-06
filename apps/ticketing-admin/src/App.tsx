@@ -5,14 +5,14 @@ import { theme } from "./theme/theme";
 import Login from "./Login";
 import "./App.scss";
 import Dashboard from "./pages/Dashboard";
-import { ProjectList } from "./project/ProjectList";
-import { ProjectCreate } from "./project/ProjectCreate";
-import { ProjectEdit } from "./project/ProjectEdit";
-import { ProjectShow } from "./project/ProjectShow";
 import { TicketList } from "./ticket/TicketList";
 import { TicketCreate } from "./ticket/TicketCreate";
 import { TicketEdit } from "./ticket/TicketEdit";
 import { TicketShow } from "./ticket/TicketShow";
+import { ProjectList } from "./project/ProjectList";
+import { ProjectCreate } from "./project/ProjectCreate";
+import { ProjectEdit } from "./project/ProjectEdit";
+import { ProjectShow } from "./project/ProjectShow";
 import { AssignmentList } from "./assignment/AssignmentList";
 import { AssignmentCreate } from "./assignment/AssignmentCreate";
 import { AssignmentEdit } from "./assignment/AssignmentEdit";
@@ -56,18 +56,18 @@ const App = (): React.ReactElement => {
         loginPage={Login}
       >
         <Resource
-          name="Project"
-          list={ProjectList}
-          edit={ProjectEdit}
-          create={ProjectCreate}
-          show={ProjectShow}
-        />
-        <Resource
           name="Ticket"
           list={TicketList}
           edit={TicketEdit}
           create={TicketCreate}
           show={TicketShow}
+        />
+        <Resource
+          name="Project"
+          list={ProjectList}
+          edit={ProjectEdit}
+          create={ProjectCreate}
+          show={ProjectShow}
         />
         <Resource
           name="Assignment"

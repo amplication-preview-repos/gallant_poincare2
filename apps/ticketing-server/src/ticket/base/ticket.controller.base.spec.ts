@@ -18,25 +18,41 @@ import { TicketService } from "../ticket.service";
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
 const CREATE_INPUT = {
+  assignedTo: "exampleAssignedTo",
   createdAt: new Date(),
+  createdBy: "exampleCreatedBy",
+  description: "exampleDescription",
   id: "exampleId",
+  title: "exampleTitle",
   updatedAt: new Date(),
 };
 const CREATE_RESULT = {
+  assignedTo: "exampleAssignedTo",
   createdAt: new Date(),
+  createdBy: "exampleCreatedBy",
+  description: "exampleDescription",
   id: "exampleId",
+  title: "exampleTitle",
   updatedAt: new Date(),
 };
 const FIND_MANY_RESULT = [
   {
+    assignedTo: "exampleAssignedTo",
     createdAt: new Date(),
+    createdBy: "exampleCreatedBy",
+    description: "exampleDescription",
     id: "exampleId",
+    title: "exampleTitle",
     updatedAt: new Date(),
   },
 ];
 const FIND_ONE_RESULT = {
+  assignedTo: "exampleAssignedTo",
   createdAt: new Date(),
+  createdBy: "exampleCreatedBy",
+  description: "exampleDescription",
   id: "exampleId",
+  title: "exampleTitle",
   updatedAt: new Date(),
 };
 

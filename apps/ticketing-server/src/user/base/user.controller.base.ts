@@ -22,6 +22,9 @@ import { User } from "./User";
 import { UserFindManyArgs } from "./UserFindManyArgs";
 import { UserWhereUniqueInput } from "./UserWhereUniqueInput";
 import { UserUpdateInput } from "./UserUpdateInput";
+import { LoginFindManyArgs } from "../../login/base/LoginFindManyArgs";
+import { Login } from "../../login/base/Login";
+import { LoginWhereUniqueInput } from "../../login/base/LoginWhereUniqueInput";
 
 export class UserControllerBase {
   constructor(protected readonly service: UserService) {}
@@ -150,5 +153,86 @@ export class UserControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.Get("/:id/logins")
+  @ApiNestedQuery(LoginFindManyArgs)
+  async findLogins(
+    @common.Req() request: Request,
+    @common.Param() params: UserWhereUniqueInput
+  ): Promise<Login[]> {
+    const query = plainToClass(LoginFindManyArgs, request.query);
+    const results = await this.service.findLogins(params.id, {
+      ...query,
+      select: {
+        createdAt: true,
+        id: true,
+        timestamp: true,
+        updatedAt: true,
+
+        user: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/logins")
+  async connectLogins(
+    @common.Param() params: UserWhereUniqueInput,
+    @common.Body() body: LoginWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      logins: {
+        connect: body,
+      },
+    };
+    await this.service.updateUser({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/logins")
+  async updateLogins(
+    @common.Param() params: UserWhereUniqueInput,
+    @common.Body() body: LoginWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      logins: {
+        set: body,
+      },
+    };
+    await this.service.updateUser({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/logins")
+  async disconnectLogins(
+    @common.Param() params: UserWhereUniqueInput,
+    @common.Body() body: LoginWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      logins: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateUser({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 }

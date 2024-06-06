@@ -11,12 +11,75 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { StringFilter } from "../../util/StringFilter";
+import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { Type } from "class-transformer";
-import { IsOptional } from "class-validator";
+import { IsOptional, ValidateNested, IsEnum } from "class-validator";
+import { AssignmentListRelationFilter } from "../../assignment/base/AssignmentListRelationFilter";
+import { CommentListRelationFilter } from "../../comment/base/CommentListRelationFilter";
+import { StringFilter } from "../../util/StringFilter";
+import { EnumTicketPriority } from "./EnumTicketPriority";
+import { ProjectWhereUniqueInput } from "../../project/base/ProjectWhereUniqueInput";
+import { EnumTicketStatus } from "./EnumTicketStatus";
 
 @InputType()
 class TicketWhereInput {
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  assignedTo?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssignmentListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => AssignmentListRelationFilter)
+  @IsOptional()
+  @Field(() => AssignmentListRelationFilter, {
+    nullable: true,
+  })
+  assignments?: AssignmentListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => CommentListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => CommentListRelationFilter)
+  @IsOptional()
+  @Field(() => CommentListRelationFilter, {
+    nullable: true,
+  })
+  comments?: CommentListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  createdBy?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  description?: StringNullableFilter;
+
   @ApiProperty({
     required: false,
     type: StringFilter,
@@ -27,6 +90,51 @@ class TicketWhereInput {
     nullable: true,
   })
   id?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumTicketPriority,
+  })
+  @IsEnum(EnumTicketPriority)
+  @IsOptional()
+  @Field(() => EnumTicketPriority, {
+    nullable: true,
+  })
+  priority?: "Option1";
+
+  @ApiProperty({
+    required: false,
+    type: () => ProjectWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ProjectWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ProjectWhereUniqueInput, {
+    nullable: true,
+  })
+  project?: ProjectWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumTicketStatus,
+  })
+  @IsEnum(EnumTicketStatus)
+  @IsOptional()
+  @Field(() => EnumTicketStatus, {
+    nullable: true,
+  })
+  status?: "Option1";
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  title?: StringNullableFilter;
 }
 
 export { TicketWhereInput as TicketWhereInput };

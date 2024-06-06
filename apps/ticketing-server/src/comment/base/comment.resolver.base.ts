@@ -17,7 +17,10 @@ import { Comment } from "./Comment";
 import { CommentCountArgs } from "./CommentCountArgs";
 import { CommentFindManyArgs } from "./CommentFindManyArgs";
 import { CommentFindUniqueArgs } from "./CommentFindUniqueArgs";
+import { CreateCommentArgs } from "./CreateCommentArgs";
+import { UpdateCommentArgs } from "./UpdateCommentArgs";
 import { DeleteCommentArgs } from "./DeleteCommentArgs";
+import { Ticket } from "../../ticket/base/Ticket";
 import { CommentService } from "../comment.service";
 @graphql.Resolver(() => Comment)
 export class CommentResolverBase {
@@ -51,6 +54,51 @@ export class CommentResolverBase {
   }
 
   @graphql.Mutation(() => Comment)
+  async createComment(
+    @graphql.Args() args: CreateCommentArgs
+  ): Promise<Comment> {
+    return await this.service.createComment({
+      ...args,
+      data: {
+        ...args.data,
+
+        ticket: args.data.ticket
+          ? {
+              connect: args.data.ticket,
+            }
+          : undefined,
+      },
+    });
+  }
+
+  @graphql.Mutation(() => Comment)
+  async updateComment(
+    @graphql.Args() args: UpdateCommentArgs
+  ): Promise<Comment | null> {
+    try {
+      return await this.service.updateComment({
+        ...args,
+        data: {
+          ...args.data,
+
+          ticket: args.data.ticket
+            ? {
+                connect: args.data.ticket,
+              }
+            : undefined,
+        },
+      });
+    } catch (error) {
+      if (isRecordNotFoundError(error)) {
+        throw new GraphQLError(
+          `No resource was found for ${JSON.stringify(args.where)}`
+        );
+      }
+      throw error;
+    }
+  }
+
+  @graphql.Mutation(() => Comment)
   async deleteComment(
     @graphql.Args() args: DeleteCommentArgs
   ): Promise<Comment | null> {
@@ -64,5 +112,18 @@ export class CommentResolverBase {
       }
       throw error;
     }
+  }
+
+  @graphql.ResolveField(() => Ticket, {
+    nullable: true,
+    name: "ticket",
+  })
+  async getTicket(@graphql.Parent() parent: Comment): Promise<Ticket | null> {
+    const result = await this.service.getTicket(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 }

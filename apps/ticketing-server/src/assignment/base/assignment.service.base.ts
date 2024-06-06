@@ -10,7 +10,11 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { PrismaService } from "../../prisma/prisma.service";
-import { Prisma, Assignment as PrismaAssignment } from "@prisma/client";
+import {
+  Prisma,
+  Assignment as PrismaAssignment,
+  Ticket as PrismaTicket,
+} from "@prisma/client";
 
 export class AssignmentServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
@@ -45,5 +49,13 @@ export class AssignmentServiceBase {
     args: Prisma.SelectSubset<T, Prisma.AssignmentDeleteArgs>
   ): Promise<PrismaAssignment> {
     return this.prisma.assignment.delete(args);
+  }
+
+  async getTicket(parentId: string): Promise<PrismaTicket | null> {
+    return this.prisma.assignment
+      .findUnique({
+        where: { id: parentId },
+      })
+      .ticket();
   }
 }

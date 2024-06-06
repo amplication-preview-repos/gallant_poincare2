@@ -9,5 +9,47 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-class ProjectCreateInput {}
+import { InputType, Field } from "@nestjs/graphql";
+import { ApiProperty } from "@nestjs/swagger";
+import { IsString, IsOptional, ValidateNested } from "class-validator";
+import { TicketCreateNestedManyWithoutProjectsInput } from "./TicketCreateNestedManyWithoutProjectsInput";
+import { Type } from "class-transformer";
+
+@InputType()
+class ProjectCreateInput {
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  description?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  name?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => TicketCreateNestedManyWithoutProjectsInput,
+  })
+  @ValidateNested()
+  @Type(() => TicketCreateNestedManyWithoutProjectsInput)
+  @IsOptional()
+  @Field(() => TicketCreateNestedManyWithoutProjectsInput, {
+    nullable: true,
+  })
+  tickets?: TicketCreateNestedManyWithoutProjectsInput;
+}
+
 export { ProjectCreateInput as ProjectCreateInput };

@@ -17,7 +17,14 @@ import { Ticket } from "./Ticket";
 import { TicketCountArgs } from "./TicketCountArgs";
 import { TicketFindManyArgs } from "./TicketFindManyArgs";
 import { TicketFindUniqueArgs } from "./TicketFindUniqueArgs";
+import { CreateTicketArgs } from "./CreateTicketArgs";
+import { UpdateTicketArgs } from "./UpdateTicketArgs";
 import { DeleteTicketArgs } from "./DeleteTicketArgs";
+import { AssignmentFindManyArgs } from "../../assignment/base/AssignmentFindManyArgs";
+import { Assignment } from "../../assignment/base/Assignment";
+import { CommentFindManyArgs } from "../../comment/base/CommentFindManyArgs";
+import { Comment } from "../../comment/base/Comment";
+import { Project } from "../../project/base/Project";
 import { TicketService } from "../ticket.service";
 @graphql.Resolver(() => Ticket)
 export class TicketResolverBase {
@@ -49,6 +56,49 @@ export class TicketResolverBase {
   }
 
   @graphql.Mutation(() => Ticket)
+  async createTicket(@graphql.Args() args: CreateTicketArgs): Promise<Ticket> {
+    return await this.service.createTicket({
+      ...args,
+      data: {
+        ...args.data,
+
+        project: args.data.project
+          ? {
+              connect: args.data.project,
+            }
+          : undefined,
+      },
+    });
+  }
+
+  @graphql.Mutation(() => Ticket)
+  async updateTicket(
+    @graphql.Args() args: UpdateTicketArgs
+  ): Promise<Ticket | null> {
+    try {
+      return await this.service.updateTicket({
+        ...args,
+        data: {
+          ...args.data,
+
+          project: args.data.project
+            ? {
+                connect: args.data.project,
+              }
+            : undefined,
+        },
+      });
+    } catch (error) {
+      if (isRecordNotFoundError(error)) {
+        throw new GraphQLError(
+          `No resource was found for ${JSON.stringify(args.where)}`
+        );
+      }
+      throw error;
+    }
+  }
+
+  @graphql.Mutation(() => Ticket)
   async deleteTicket(
     @graphql.Args() args: DeleteTicketArgs
   ): Promise<Ticket | null> {
@@ -62,5 +112,46 @@ export class TicketResolverBase {
       }
       throw error;
     }
+  }
+
+  @graphql.ResolveField(() => [Assignment], { name: "assignments" })
+  async findAssignments(
+    @graphql.Parent() parent: Ticket,
+    @graphql.Args() args: AssignmentFindManyArgs
+  ): Promise<Assignment[]> {
+    const results = await this.service.findAssignments(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @graphql.ResolveField(() => [Comment], { name: "comments" })
+  async findComments(
+    @graphql.Parent() parent: Ticket,
+    @graphql.Args() args: CommentFindManyArgs
+  ): Promise<Comment[]> {
+    const results = await this.service.findComments(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @graphql.ResolveField(() => Project, {
+    nullable: true,
+    name: "project",
+  })
+  async getProject(@graphql.Parent() parent: Ticket): Promise<Project | null> {
+    const result = await this.service.getProject(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 }

@@ -31,10 +31,26 @@ export class AssignmentControllerBase {
     @common.Body() data: AssignmentCreateInput
   ): Promise<Assignment> {
     return await this.service.createAssignment({
-      data: data,
+      data: {
+        ...data,
+
+        ticket: data.ticket
+          ? {
+              connect: data.ticket,
+            }
+          : undefined,
+      },
       select: {
+        assignee: true,
         createdAt: true,
         id: true,
+
+        ticket: {
+          select: {
+            id: true,
+          },
+        },
+
         updatedAt: true,
       },
     });
@@ -48,8 +64,16 @@ export class AssignmentControllerBase {
     return this.service.assignments({
       ...args,
       select: {
+        assignee: true,
         createdAt: true,
         id: true,
+
+        ticket: {
+          select: {
+            id: true,
+          },
+        },
+
         updatedAt: true,
       },
     });
@@ -64,8 +88,16 @@ export class AssignmentControllerBase {
     const result = await this.service.assignment({
       where: params,
       select: {
+        assignee: true,
         createdAt: true,
         id: true,
+
+        ticket: {
+          select: {
+            id: true,
+          },
+        },
+
         updatedAt: true,
       },
     });
@@ -87,10 +119,26 @@ export class AssignmentControllerBase {
     try {
       return await this.service.updateAssignment({
         where: params,
-        data: data,
+        data: {
+          ...data,
+
+          ticket: data.ticket
+            ? {
+                connect: data.ticket,
+              }
+            : undefined,
+        },
         select: {
+          assignee: true,
           createdAt: true,
           id: true,
+
+          ticket: {
+            select: {
+              id: true,
+            },
+          },
+
           updatedAt: true,
         },
       });
@@ -114,8 +162,16 @@ export class AssignmentControllerBase {
       return await this.service.deleteAssignment({
         where: params,
         select: {
+          assignee: true,
           createdAt: true,
           id: true,
+
+          ticket: {
+            select: {
+              id: true,
+            },
+          },
+
           updatedAt: true,
         },
       });

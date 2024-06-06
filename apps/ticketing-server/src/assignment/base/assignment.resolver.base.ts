@@ -17,7 +17,10 @@ import { Assignment } from "./Assignment";
 import { AssignmentCountArgs } from "./AssignmentCountArgs";
 import { AssignmentFindManyArgs } from "./AssignmentFindManyArgs";
 import { AssignmentFindUniqueArgs } from "./AssignmentFindUniqueArgs";
+import { CreateAssignmentArgs } from "./CreateAssignmentArgs";
+import { UpdateAssignmentArgs } from "./UpdateAssignmentArgs";
 import { DeleteAssignmentArgs } from "./DeleteAssignmentArgs";
+import { Ticket } from "../../ticket/base/Ticket";
 import { AssignmentService } from "../assignment.service";
 @graphql.Resolver(() => Assignment)
 export class AssignmentResolverBase {
@@ -51,6 +54,51 @@ export class AssignmentResolverBase {
   }
 
   @graphql.Mutation(() => Assignment)
+  async createAssignment(
+    @graphql.Args() args: CreateAssignmentArgs
+  ): Promise<Assignment> {
+    return await this.service.createAssignment({
+      ...args,
+      data: {
+        ...args.data,
+
+        ticket: args.data.ticket
+          ? {
+              connect: args.data.ticket,
+            }
+          : undefined,
+      },
+    });
+  }
+
+  @graphql.Mutation(() => Assignment)
+  async updateAssignment(
+    @graphql.Args() args: UpdateAssignmentArgs
+  ): Promise<Assignment | null> {
+    try {
+      return await this.service.updateAssignment({
+        ...args,
+        data: {
+          ...args.data,
+
+          ticket: args.data.ticket
+            ? {
+                connect: args.data.ticket,
+              }
+            : undefined,
+        },
+      });
+    } catch (error) {
+      if (isRecordNotFoundError(error)) {
+        throw new GraphQLError(
+          `No resource was found for ${JSON.stringify(args.where)}`
+        );
+      }
+      throw error;
+    }
+  }
+
+  @graphql.Mutation(() => Assignment)
   async deleteAssignment(
     @graphql.Args() args: DeleteAssignmentArgs
   ): Promise<Assignment | null> {
@@ -64,5 +112,20 @@ export class AssignmentResolverBase {
       }
       throw error;
     }
+  }
+
+  @graphql.ResolveField(() => Ticket, {
+    nullable: true,
+    name: "ticket",
+  })
+  async getTicket(
+    @graphql.Parent() parent: Assignment
+  ): Promise<Ticket | null> {
+    const result = await this.service.getTicket(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 }

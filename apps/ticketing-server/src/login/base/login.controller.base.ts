@@ -29,11 +29,26 @@ export class LoginControllerBase {
   @swagger.ApiCreatedResponse({ type: Login })
   async createLogin(@common.Body() data: LoginCreateInput): Promise<Login> {
     return await this.service.createLogin({
-      data: data,
+      data: {
+        ...data,
+
+        user: data.user
+          ? {
+              connect: data.user,
+            }
+          : undefined,
+      },
       select: {
         createdAt: true,
         id: true,
+        timestamp: true,
         updatedAt: true,
+
+        user: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
@@ -48,7 +63,14 @@ export class LoginControllerBase {
       select: {
         createdAt: true,
         id: true,
+        timestamp: true,
         updatedAt: true,
+
+        user: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
@@ -64,7 +86,14 @@ export class LoginControllerBase {
       select: {
         createdAt: true,
         id: true,
+        timestamp: true,
         updatedAt: true,
+
+        user: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (result === null) {
@@ -85,11 +114,26 @@ export class LoginControllerBase {
     try {
       return await this.service.updateLogin({
         where: params,
-        data: data,
+        data: {
+          ...data,
+
+          user: data.user
+            ? {
+                connect: data.user,
+              }
+            : undefined,
+        },
         select: {
           createdAt: true,
           id: true,
+          timestamp: true,
           updatedAt: true,
+
+          user: {
+            select: {
+              id: true,
+            },
+          },
         },
       });
     } catch (error) {
@@ -114,7 +158,14 @@ export class LoginControllerBase {
         select: {
           createdAt: true,
           id: true,
+          timestamp: true,
           updatedAt: true,
+
+          user: {
+            select: {
+              id: true,
+            },
+          },
         },
       });
     } catch (error) {

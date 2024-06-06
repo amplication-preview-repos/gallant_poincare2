@@ -11,11 +11,23 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDate, IsString } from "class-validator";
+import { IsString, IsOptional, IsDate, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
+import { Ticket } from "../../ticket/base/Ticket";
 
 @ObjectType()
 class Assignment {
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  assignee!: string | null;
+
   @ApiProperty({
     required: true,
   })
@@ -31,6 +43,15 @@ class Assignment {
   @IsString()
   @Field(() => String)
   id!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => Ticket,
+  })
+  @ValidateNested()
+  @Type(() => Ticket)
+  @IsOptional()
+  ticket?: Ticket | null;
 
   @ApiProperty({
     required: true,

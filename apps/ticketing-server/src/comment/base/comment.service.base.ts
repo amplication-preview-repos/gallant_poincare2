@@ -10,7 +10,11 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { PrismaService } from "../../prisma/prisma.service";
-import { Prisma, Comment as PrismaComment } from "@prisma/client";
+import {
+  Prisma,
+  Comment as PrismaComment,
+  Ticket as PrismaTicket,
+} from "@prisma/client";
 
 export class CommentServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
@@ -43,5 +47,13 @@ export class CommentServiceBase {
     args: Prisma.SelectSubset<T, Prisma.CommentDeleteArgs>
   ): Promise<PrismaComment> {
     return this.prisma.comment.delete(args);
+  }
+
+  async getTicket(parentId: string): Promise<PrismaTicket | null> {
+    return this.prisma.comment
+      .findUnique({
+        where: { id: parentId },
+      })
+      .ticket();
   }
 }

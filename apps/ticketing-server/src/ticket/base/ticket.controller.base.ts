@@ -22,6 +22,12 @@ import { Ticket } from "./Ticket";
 import { TicketFindManyArgs } from "./TicketFindManyArgs";
 import { TicketWhereUniqueInput } from "./TicketWhereUniqueInput";
 import { TicketUpdateInput } from "./TicketUpdateInput";
+import { AssignmentFindManyArgs } from "../../assignment/base/AssignmentFindManyArgs";
+import { Assignment } from "../../assignment/base/Assignment";
+import { AssignmentWhereUniqueInput } from "../../assignment/base/AssignmentWhereUniqueInput";
+import { CommentFindManyArgs } from "../../comment/base/CommentFindManyArgs";
+import { Comment } from "../../comment/base/Comment";
+import { CommentWhereUniqueInput } from "../../comment/base/CommentWhereUniqueInput";
 
 export class TicketControllerBase {
   constructor(protected readonly service: TicketService) {}
@@ -29,10 +35,31 @@ export class TicketControllerBase {
   @swagger.ApiCreatedResponse({ type: Ticket })
   async createTicket(@common.Body() data: TicketCreateInput): Promise<Ticket> {
     return await this.service.createTicket({
-      data: data,
+      data: {
+        ...data,
+
+        project: data.project
+          ? {
+              connect: data.project,
+            }
+          : undefined,
+      },
       select: {
+        assignedTo: true,
         createdAt: true,
+        createdBy: true,
+        description: true,
         id: true,
+        priority: true,
+
+        project: {
+          select: {
+            id: true,
+          },
+        },
+
+        status: true,
+        title: true,
         updatedAt: true,
       },
     });
@@ -46,8 +73,21 @@ export class TicketControllerBase {
     return this.service.tickets({
       ...args,
       select: {
+        assignedTo: true,
         createdAt: true,
+        createdBy: true,
+        description: true,
         id: true,
+        priority: true,
+
+        project: {
+          select: {
+            id: true,
+          },
+        },
+
+        status: true,
+        title: true,
         updatedAt: true,
       },
     });
@@ -62,8 +102,21 @@ export class TicketControllerBase {
     const result = await this.service.ticket({
       where: params,
       select: {
+        assignedTo: true,
         createdAt: true,
+        createdBy: true,
+        description: true,
         id: true,
+        priority: true,
+
+        project: {
+          select: {
+            id: true,
+          },
+        },
+
+        status: true,
+        title: true,
         updatedAt: true,
       },
     });
@@ -85,10 +138,31 @@ export class TicketControllerBase {
     try {
       return await this.service.updateTicket({
         where: params,
-        data: data,
+        data: {
+          ...data,
+
+          project: data.project
+            ? {
+                connect: data.project,
+              }
+            : undefined,
+        },
         select: {
+          assignedTo: true,
           createdAt: true,
+          createdBy: true,
+          description: true,
           id: true,
+          priority: true,
+
+          project: {
+            select: {
+              id: true,
+            },
+          },
+
+          status: true,
+          title: true,
           updatedAt: true,
         },
       });
@@ -112,8 +186,21 @@ export class TicketControllerBase {
       return await this.service.deleteTicket({
         where: params,
         select: {
+          assignedTo: true,
           createdAt: true,
+          createdBy: true,
+          description: true,
           id: true,
+          priority: true,
+
+          project: {
+            select: {
+              id: true,
+            },
+          },
+
+          status: true,
+          title: true,
           updatedAt: true,
         },
       });
@@ -125,5 +212,170 @@ export class TicketControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.Get("/:id/assignments")
+  @ApiNestedQuery(AssignmentFindManyArgs)
+  async findAssignments(
+    @common.Req() request: Request,
+    @common.Param() params: TicketWhereUniqueInput
+  ): Promise<Assignment[]> {
+    const query = plainToClass(AssignmentFindManyArgs, request.query);
+    const results = await this.service.findAssignments(params.id, {
+      ...query,
+      select: {
+        assignee: true,
+        createdAt: true,
+        id: true,
+
+        ticket: {
+          select: {
+            id: true,
+          },
+        },
+
+        updatedAt: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/assignments")
+  async connectAssignments(
+    @common.Param() params: TicketWhereUniqueInput,
+    @common.Body() body: AssignmentWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      assignments: {
+        connect: body,
+      },
+    };
+    await this.service.updateTicket({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/assignments")
+  async updateAssignments(
+    @common.Param() params: TicketWhereUniqueInput,
+    @common.Body() body: AssignmentWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      assignments: {
+        set: body,
+      },
+    };
+    await this.service.updateTicket({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/assignments")
+  async disconnectAssignments(
+    @common.Param() params: TicketWhereUniqueInput,
+    @common.Body() body: AssignmentWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      assignments: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateTicket({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Get("/:id/comments")
+  @ApiNestedQuery(CommentFindManyArgs)
+  async findComments(
+    @common.Req() request: Request,
+    @common.Param() params: TicketWhereUniqueInput
+  ): Promise<Comment[]> {
+    const query = plainToClass(CommentFindManyArgs, request.query);
+    const results = await this.service.findComments(params.id, {
+      ...query,
+      select: {
+        content: true,
+        createdAt: true,
+        createdBy: true,
+        id: true,
+
+        ticket: {
+          select: {
+            id: true,
+          },
+        },
+
+        updatedAt: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/comments")
+  async connectComments(
+    @common.Param() params: TicketWhereUniqueInput,
+    @common.Body() body: CommentWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      comments: {
+        connect: body,
+      },
+    };
+    await this.service.updateTicket({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/comments")
+  async updateComments(
+    @common.Param() params: TicketWhereUniqueInput,
+    @common.Body() body: CommentWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      comments: {
+        set: body,
+      },
+    };
+    await this.service.updateTicket({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/comments")
+  async disconnectComments(
+    @common.Param() params: TicketWhereUniqueInput,
+    @common.Body() body: CommentWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      comments: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateTicket({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 }

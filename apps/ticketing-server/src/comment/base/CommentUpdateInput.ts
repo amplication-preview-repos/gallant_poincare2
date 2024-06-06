@@ -9,5 +9,47 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-class CommentUpdateInput {}
+import { InputType, Field } from "@nestjs/graphql";
+import { ApiProperty } from "@nestjs/swagger";
+import { IsString, IsOptional, ValidateNested } from "class-validator";
+import { TicketWhereUniqueInput } from "../../ticket/base/TicketWhereUniqueInput";
+import { Type } from "class-transformer";
+
+@InputType()
+class CommentUpdateInput {
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  content?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  createdBy?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => TicketWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => TicketWhereUniqueInput)
+  @IsOptional()
+  @Field(() => TicketWhereUniqueInput, {
+    nullable: true,
+  })
+  ticket?: TicketWhereUniqueInput | null;
+}
+
 export { CommentUpdateInput as CommentUpdateInput };

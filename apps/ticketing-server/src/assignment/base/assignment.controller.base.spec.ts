@@ -18,23 +18,27 @@ import { AssignmentService } from "../assignment.service";
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
 const CREATE_INPUT = {
+  assignee: "exampleAssignee",
   createdAt: new Date(),
   id: "exampleId",
   updatedAt: new Date(),
 };
 const CREATE_RESULT = {
+  assignee: "exampleAssignee",
   createdAt: new Date(),
   id: "exampleId",
   updatedAt: new Date(),
 };
 const FIND_MANY_RESULT = [
   {
+    assignee: "exampleAssignee",
     createdAt: new Date(),
     id: "exampleId",
     updatedAt: new Date(),
   },
 ];
 const FIND_ONE_RESULT = {
+  assignee: "exampleAssignee",
   createdAt: new Date(),
   id: "exampleId",
   updatedAt: new Date(),

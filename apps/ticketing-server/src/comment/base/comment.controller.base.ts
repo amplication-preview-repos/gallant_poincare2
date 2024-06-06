@@ -31,10 +31,27 @@ export class CommentControllerBase {
     @common.Body() data: CommentCreateInput
   ): Promise<Comment> {
     return await this.service.createComment({
-      data: data,
+      data: {
+        ...data,
+
+        ticket: data.ticket
+          ? {
+              connect: data.ticket,
+            }
+          : undefined,
+      },
       select: {
+        content: true,
         createdAt: true,
+        createdBy: true,
         id: true,
+
+        ticket: {
+          select: {
+            id: true,
+          },
+        },
+
         updatedAt: true,
       },
     });
@@ -48,8 +65,17 @@ export class CommentControllerBase {
     return this.service.comments({
       ...args,
       select: {
+        content: true,
         createdAt: true,
+        createdBy: true,
         id: true,
+
+        ticket: {
+          select: {
+            id: true,
+          },
+        },
+
         updatedAt: true,
       },
     });
@@ -64,8 +90,17 @@ export class CommentControllerBase {
     const result = await this.service.comment({
       where: params,
       select: {
+        content: true,
         createdAt: true,
+        createdBy: true,
         id: true,
+
+        ticket: {
+          select: {
+            id: true,
+          },
+        },
+
         updatedAt: true,
       },
     });
@@ -87,10 +122,27 @@ export class CommentControllerBase {
     try {
       return await this.service.updateComment({
         where: params,
-        data: data,
+        data: {
+          ...data,
+
+          ticket: data.ticket
+            ? {
+                connect: data.ticket,
+              }
+            : undefined,
+        },
         select: {
+          content: true,
           createdAt: true,
+          createdBy: true,
           id: true,
+
+          ticket: {
+            select: {
+              id: true,
+            },
+          },
+
           updatedAt: true,
         },
       });
@@ -114,8 +166,17 @@ export class CommentControllerBase {
       return await this.service.deleteComment({
         where: params,
         select: {
+          content: true,
           createdAt: true,
+          createdBy: true,
           id: true,
+
+          ticket: {
+            select: {
+              id: true,
+            },
+          },
+
           updatedAt: true,
         },
       });

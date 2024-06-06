@@ -18,24 +18,32 @@ import { CommentService } from "../comment.service";
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
 const CREATE_INPUT = {
+  content: "exampleContent",
   createdAt: new Date(),
+  createdBy: "exampleCreatedBy",
   id: "exampleId",
   updatedAt: new Date(),
 };
 const CREATE_RESULT = {
+  content: "exampleContent",
   createdAt: new Date(),
+  createdBy: "exampleCreatedBy",
   id: "exampleId",
   updatedAt: new Date(),
 };
 const FIND_MANY_RESULT = [
   {
+    content: "exampleContent",
     createdAt: new Date(),
+    createdBy: "exampleCreatedBy",
     id: "exampleId",
     updatedAt: new Date(),
   },
 ];
 const FIND_ONE_RESULT = {
+  content: "exampleContent",
   createdAt: new Date(),
+  createdBy: "exampleCreatedBy",
   id: "exampleId",
   updatedAt: new Date(),
 };

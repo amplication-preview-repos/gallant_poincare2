@@ -11,11 +11,51 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDate, IsString } from "class-validator";
+import {
+  IsString,
+  IsOptional,
+  ValidateNested,
+  IsDate,
+  IsEnum,
+} from "class-validator";
+import { Assignment } from "../../assignment/base/Assignment";
 import { Type } from "class-transformer";
+import { Comment } from "../../comment/base/Comment";
+import { EnumTicketPriority } from "./EnumTicketPriority";
+import { Project } from "../../project/base/Project";
+import { EnumTicketStatus } from "./EnumTicketStatus";
 
 @ObjectType()
 class Ticket {
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  assignedTo!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Assignment],
+  })
+  @ValidateNested()
+  @Type(() => Assignment)
+  @IsOptional()
+  assignments?: Array<Assignment>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Comment],
+  })
+  @ValidateNested()
+  @Type(() => Comment)
+  @IsOptional()
+  comments?: Array<Comment>;
+
   @ApiProperty({
     required: true,
   })
@@ -25,12 +65,76 @@ class Ticket {
   createdAt!: Date;
 
   @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  createdBy!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  description!: string | null;
+
+  @ApiProperty({
     required: true,
     type: String,
   })
   @IsString()
   @Field(() => String)
   id!: string;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumTicketPriority,
+  })
+  @IsEnum(EnumTicketPriority)
+  @IsOptional()
+  @Field(() => EnumTicketPriority, {
+    nullable: true,
+  })
+  priority?: "Option1" | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => Project,
+  })
+  @ValidateNested()
+  @Type(() => Project)
+  @IsOptional()
+  project?: Project | null;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumTicketStatus,
+  })
+  @IsEnum(EnumTicketStatus)
+  @IsOptional()
+  @Field(() => EnumTicketStatus, {
+    nullable: true,
+  })
+  status?: "Option1" | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  title!: string | null;
 
   @ApiProperty({
     required: true,

@@ -17,7 +17,11 @@ import { Project } from "./Project";
 import { ProjectCountArgs } from "./ProjectCountArgs";
 import { ProjectFindManyArgs } from "./ProjectFindManyArgs";
 import { ProjectFindUniqueArgs } from "./ProjectFindUniqueArgs";
+import { CreateProjectArgs } from "./CreateProjectArgs";
+import { UpdateProjectArgs } from "./UpdateProjectArgs";
 import { DeleteProjectArgs } from "./DeleteProjectArgs";
+import { TicketFindManyArgs } from "../../ticket/base/TicketFindManyArgs";
+import { Ticket } from "../../ticket/base/Ticket";
 import { ProjectService } from "../project.service";
 @graphql.Resolver(() => Project)
 export class ProjectResolverBase {
@@ -51,6 +55,35 @@ export class ProjectResolverBase {
   }
 
   @graphql.Mutation(() => Project)
+  async createProject(
+    @graphql.Args() args: CreateProjectArgs
+  ): Promise<Project> {
+    return await this.service.createProject({
+      ...args,
+      data: args.data,
+    });
+  }
+
+  @graphql.Mutation(() => Project)
+  async updateProject(
+    @graphql.Args() args: UpdateProjectArgs
+  ): Promise<Project | null> {
+    try {
+      return await this.service.updateProject({
+        ...args,
+        data: args.data,
+      });
+    } catch (error) {
+      if (isRecordNotFoundError(error)) {
+        throw new GraphQLError(
+          `No resource was found for ${JSON.stringify(args.where)}`
+        );
+      }
+      throw error;
+    }
+  }
+
+  @graphql.Mutation(() => Project)
   async deleteProject(
     @graphql.Args() args: DeleteProjectArgs
   ): Promise<Project | null> {
@@ -64,5 +97,19 @@ export class ProjectResolverBase {
       }
       throw error;
     }
+  }
+
+  @graphql.ResolveField(() => [Ticket], { name: "tickets" })
+  async findTickets(
+    @graphql.Parent() parent: Project,
+    @graphql.Args() args: TicketFindManyArgs
+  ): Promise<Ticket[]> {
+    const results = await this.service.findTickets(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
   }
 }
